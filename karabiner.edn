@@ -174,21 +174,21 @@
 
     {:des "combos - aka simultaneus key presses to make shortcut"
          :rules [[:condi :colemakdh]
-            [[:w :e] :!Cgrave_accent_and_tilde]     ; combo we keys --> undo (ctrl + z)
-            [[:e :r] :!SCgrave_accent_and_tilde]    ; combo er keys --> redo (ctrl + shift + z)
-            [[:grave_accent_and_tilde :z] :!Cz]     ; combo `z keys --> cut (ctrl + x)    
-            [[:z :x] :!Cx]                          ; combo zx keys --> copy
-            [[:x :c] :!Cv]                          ; combo xc keys --> paste
-            [[:z :v] :!COSv]                        ; combo zv keys --> paste without formatting
-            [[:i :o] :hyphen]                       ; combo io keys --> - hyphen / dash
-            [[:grave_accent_and_tilde :c] :!Ca]     ; combo grave_accent_and_tilde and v keys --> select all
-            [[:k :l] :equal_sign]                   ; combo kl keys --> = equals sign
-            [[:comma :period] :!Shyphen]            ; combo ,. keys --> _ underscore
-            [[:period :slash] :!Sslash]             ; combo ./ keys --> ? question mark
-            [[:slash :right_shift] :!S1]            ; combo /shift keys --> ! exclamation mark
-            [[:m :comma] :!Squote]                  ; combo m, keys --> " quote
-            [[:9 :0] :!Tb]                          ; combo 90 keys --> hide/show terminal within vscode
-            [[:8 :9 :0] :!STb]                      ; combo 890 keys--> new8 terminal within vscode
+            [[:w :e] :!Cgrave_accent_and_tilde]         ; combo we keys --> undo (ctrl + z)
+            [[:e :r] :!SCgrave_accent_and_tilde]        ; combo er keys --> redo (ctrl + shift + z)
+            [[:grave_accent_and_tilde :z] :!Cz]         ; combo `z keys --> cut (ctrl + x)    
+            [[:z :x] :!Cx]                              ; combo zx keys --> copy
+            [[:x :c] :!Cv]                              ; combo xc keys --> paste
+            [[:z :v] :!COSv]                            ; combo zv keys --> paste without formatting
+            [[:i :o] :hyphen]                           ; combo io keys --> - hyphen / dash
+            [[:grave_accent_and_tilde :c] :!Ca]         ; combo grave_accent_and_tilde and v keys --> select all
+            [[:k :l] :equal_sign]                       ; combo kl keys --> = equals sign
+            [[:comma :period] :!Shyphen]                ; combo ,. keys --> _ underscore
+            [[:period :slash] :!Sslash]                 ; combo ./ keys --> ? question mark
+            [[:slash :right_shift] :!S1]                ; combo /shift keys --> ! exclamation mark
+            [[:m :comma] :!Squote :!Squote :left_arrow] ; combo m, keys --> "" quote, move cursor between them
+            [[:9 :0] :!Tb]                              ; combo 90 keys --> hide/show terminal within vscode
+            [[:8 :9 :0] :!STb]                          ; combo 890 keys--> new8 terminal within vscode
             ]}
             ;;
 
@@ -286,7 +286,9 @@
     {:des "leader key" 
          :rules [[:condi :period-mode :colemakdh] ; hold caps-lock to use the predefned keysequences only on colemak-dh keyboard layout
           [:a [:!S9 :!S0 :spacebar :equal_sign :!Speriod :spacebar :!Sopen_bracket :spacebar :!Sclose_bracket :left_arrow]]
-          [:b [:b :b :b :y :a :v :a :d :x :s :l :r :f :return_or_enter]]
+          [:b [:b :b :b :y :a :v :a :d :x :s :l :r :f :return_or_enter]] ; obsidian javascript code block
+          [:c [:!Scomma :c :l :v :!Speriod :!Scomma :slash :c :l :v :!Speriod :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow]] ; <div></div> 
+          [:g [:!Scomma :f :a :g :!Speriod :!Scomma :slash :f :a :g :!Speriod :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow :!Cc :!Cc]] ;generic html tag, select both for editing <tag></tag>
           ]} 
          
     {:des "navigation layer"
