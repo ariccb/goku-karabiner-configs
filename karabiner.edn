@@ -1,0 +1,335 @@
+{
+    ;; tutorial: https://github.com/yqrashawn/GokuRakuJoudo/blob/master/tutorial.md
+
+    ;; :!Ca is keycode :a and prefix a with !C
+
+    ;; C  | left_command
+    ;; T  | left_control
+    ;; O  | left_option
+    ;; S  | left_shift
+    ;; F  | fn
+    ;; Q  | right_command
+    ;; W  | right_control
+    ;; E  | right_option
+    ;; R  | right_shift
+    ;; P  | caps_lock
+    ;; !! | command + control + optional + shift (hyper)
+
+    ;; code for all this:
+    ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/b9b334a187379f9bc8182ad59e2cca2a1789e9c0/src/karabiner_configurator/keys.clj#L68
+
+    ;; FROM modifiers
+    ;; to understand better how modifiers work in karabiner
+    ;; karabiner definition of mandatory and optional
+    ;; https://karabiner-elements.pqrs.org/docs/json/complex-modifications-manipulator-definition/from/modifiers/
+
+    ;;    | no modifier
+    ;;                  input key maps to output key exactly
+    ;;                  adding any modifier will cancel the event
+
+    ;; !  | mandatory
+    ;;                  specified modifier is removed in output (to event)
+    ;;                  specified modifiers must be present for event to occur
+    ;;                  adding any other modifier will cancel the event
+
+    ;; #  | optional (single)
+    ;;                  specified modifier is kept in output (to event)
+    ;;                  one (or none) of the specified modifiers must be present
+    ;;                  adding any other modifier will cancel the event
+
+    ;; ## | optional any
+    ;;                  specified modifier is removed in output (to event)
+    ;;                  specified modifiers *must* be present for event to occur
+    ;;                  adding any other modifier will add to output event
+    ;;                  (what you typically expect, additional modifiers tacked on)
+    ;;
+    ;; need to prefix C T O S F with ! or #
+    ;;
+
+
+:profiles {
+    :Default {
+        :default true
+
+        :sim     50     ;; simultaneous_threshold_milliseconds (def: 50)
+                        ;; if keydown event for two different keys are pressed within :sim ms, the keypresses are considered simultaneous
+        :delay   150    ;; to_delayed_action_delay_milliseconds (def: 500)
+                        ;; after :delay ms, the key press is considered to be delayed (used for double-press macros)
+        :alone   500    ;; to_if_alone_timeout_milliseconds (def: 1000)
+                        ;; if keyup event comes within :alone ms from keydown, the key is not just pressed but held
+        :held    500    ;; to_if_held_down_threshold_milliseconds (def: 500)
+                        ;; key is fired twice when :held ms is elapsed (otherwise seen as a hold command) (TODO WHAT IS THIS??)
+    }
+} ;; profiles
+
+; the default value is 250
+:simlayer-threshold 500
+
+:templates {
+    :km "osascript -e 'tell application \"Keyboard Maestro Engine\" to do script \"%s\"'"
+    :open "open \"%s\""
+} ;; templates
+
+;; Define different input sources for conditions per keyboard layout being used
+:input-sources {
+    :abc {
+        :input_source_id "com.apple.keylayout.ABC"
+        :language "en"
+        }
+    :colemakdh {
+        :input_source_id "io.github.colemakmods.keyboardlayout.colemakdh.colemakdhiso-extended"
+        :language "en"
+    }
+} ;; input-sources
+
+;; Define different kinds of keyboards
+:devices {
+    :apple [
+            {:vendor_id 1452}
+            {:vendor_id 76}
+    ]
+    :ap2 [{:vendor_id 1241, :product_id 41618 }] ;; Anne Pro 2 (mechanical)
+    :msft [{:vendor_id 1118, :product_id 1957 }] ;; Microsoft Keyboard [Ergonomic Sculpt]
+    :tada68 [{:vendor_id 65261, :product_id 4611 }] ;; Tada68 (mechanical)
+    :kinesis [{:vendor_id 10730 }] ;; Kinesis Advantage 2 keyboard
+    :g915   [{:vendor_id 1133}] ;; Logitech G915 keyboard
+
+    :kybs [  ;; Default for all keyboards
+        {:vendor_id 1452}
+        {:vendor_id 76}
+        {:vendor_id 1241, :product_id 41618 }
+        {:vendor_id 1118, :product_id 1957 }
+        {:vendor_id 65261, :product_id 4611 }
+        {:vendor_id 10730}
+        {:vendor_id 1133, :product_id 50501 }
+    ]
+
+    :kybs-kinesis [  ;; All keyboards (except Kinesis)
+        {:vendor_id 1452}
+        {:vendor_id 76}
+        {:vendor_id 1241, :product_id 41618 }
+        {:vendor_id 1118, :product_id 1957 }
+        {:vendor_id 65261, :product_id 4611 }
+        {:vendor_id 1133, :product_id 50501 }
+    ]
+
+} ;; devices
+
+;; layers are basically "hyper" keys
+;; press this in combination with something else and depending on your rule, make things happen
+
+
+;; simlayers are basically "hyper" keys
+;; layers works too, but only recommended for non-typing keys like . or tab
+;; to use more regular typing keys, use simlayers
+:simlayers {
+  :a-mode {:key :a}
+  :period-mode {:key :period}
+  :r-mode {:key :r}
+  :one-shot-shift-mode {:key :left_shift}
+  :spacebar-mode {:key :spacebar }
+  :caps-mode {:key :caps_lock}
+  :tab-mode {:key :tab}
+} ;; simlayers
+
+:applications {
+    :terminals  [ "^com\\.apple\\.Terminal$",
+                 "^com\\.googlecode\\.iterm2$"]
+}
+
+;; main contains multiple manipulators
+:main [
+
+
+    ;; each manipulator has a description and multiple rules
+
+    ;;{:des "..."                               ;; -> description
+    ;; :rules[
+    ;;          [<from>  <to>  <conditions>]    ;; -> rule 1
+    ;;          [<from>  <to>  <conditions>]    ;; -> rule 2
+    ;; ]}
+
+    ;; rule [:period ["period-mode" 1] nil {:afterup ["period-mode" 0] :alone :period}]
+    ;;       |_____| |_______________| |_| |_________________________________________|
+    ;;        <from>    <to>      <conditions>         <other options>
+    ;;
+    ;; karabiner docs: ;; https://pqrs.org/osx/karabiner/json.html#complex_modifications-manipulator-definition
+    ;; <other options> includs ~to_if_alone~, ~to_if_held_down~,~to_after_key_up~, ~to_delayed_action~ and ~parameters~.
+    ;;
+                                    
+    ;; (custom variables) & modifiers -> Advanced
+    ;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/examples.org#custom-variable
+
+    {:des "left cmd -> enter or return on tap, still cmd on hold"
+         :rules [[:condi :colemakdh][:##left_command :left_command nil {:alone :return_or_enter}]]}
+
+    {:des "right cmd -> delete on tap, still right cmd on hold"
+         :rules [[:condi :colemakdh][:##right_command :right_command [:!spacebar-mode] {:alone :delete_forward}]]}
+
+    {:des "tab -> escape key on tap, hyper on hold"
+         :rules [[:condi :colemakdh][:##tab  [:left_command :left_control :left_option :left_shift] nil {:alone :escape}]]}
+
+    {:des "caps_lock -> tab on tap, hyper on hold"     
+         :rules [[:condi :colemakdh][:##caps_lock [:left_command :left_control :left_option] nil {:alone :tab}]]}
+
+    {:des "combos - aka simultaneus key presses to make shortcut"
+         :rules [[:condi :colemakdh]
+            [[:w :e] :!Cgrave_accent_and_tilde]     ; combo we keys --> undo (ctrl + z)
+            [[:e :r] :!SCgrave_accent_and_tilde]    ; combo er keys --> redo (ctrl + shift + z)
+            [[:grave_accent_and_tilde :z] :!Cz]     ; combo `z keys --> cut (ctrl + x)    
+            [[:z :x] :!Cx]                          ; combo zx keys --> copy
+            [[:x :c] :!Cv]                          ; combo xc keys --> paste
+            [[:z :v] :!COSv]                        ; combo zv keys --> paste without formatting
+            [[:i :o] :hyphen]                       ; combo io keys --> - hyphen / dash
+            [[:grave_accent_and_tilde :c] :!Ca]     ; combo grave_accent_and_tilde and v keys --> select all
+            [[:k :l] :equal_sign]                   ; combo kl keys --> = equals sign
+            [[:comma :period] :!Shyphen]            ; combo ,. keys --> _ underscore
+            [[:period :slash] :!Sslash]             ; combo ./ keys --> ? question mark
+            [[:slash :right_shift] :!S1]            ; combo /shift keys --> ! exclamation mark
+            [[:m :comma] :!Squote]                  ; combo m, keys --> " quote
+            [[:9 :0] :!Tb]                          ; combo 90 keys --> hide/show terminal within vscode
+            [[:8 :9 :0] :!STb]                      ; combo 890 keys--> new8 terminal within vscode
+            ]}
+            ;;
+
+    ;; {:des "adaptive keys - re --> rf" ;; pf --> pt in colemak DH
+    ;; :rules [
+    ;;         ; If right-shift-mode is on, run this command when a is pressed. Anything that depends
+    ;;         ; on the mode being set must come _before_ the delayed declaration.
+    ;;         [:r [:e [:r-mode]]]
+    ;;         ; Send right_shift unconditionally (so it still works as a modifier key)
+    ;;         [:r nil
+    ;;         ; and if pressed alone, trigger right-shift-mode
+    ;;         {:alone [:r ["r-mode" 0]]
+    ;;         ; when another key is invoked, or after a timeout, set the mode back to zero
+    ;;         :delayed {:invoked ["r-mode" 0] :canceled ["r-mode" 0]}}]  
+            
+    ;;         ]}
+
+
+    ;; {:des "one-shot-shift-mode - tap left shift then keys will still produce shifted result"
+    ;; :rules [
+    ;;         ; If right-shift-mode is on, run this command when a is pressed. Anything that depends
+    ;;         ; on the mode being set must come _before_ the delayed declaration.
+    ;;         [:non_us_backslash :grave_accent_and_tilde [:one-shot-shift-mode]]
+    ;;         [:q :!Sq [:one-shot-shift-mode]]
+    ;;         [:w :!Sw [:one-shot-shift-mode]]
+    ;;         [:e:!Se [:one-shot-shift-mode]]
+    ;;         [:r:!Sr [:one-shot-shift-mode]]
+    ;;         [:t:!St [:one-shot-shift-mode]]
+    ;;         [:y:!Sy [:one-shot-shift-mode]]
+    ;;         [:u:!Su [:one-shot-shift-mode]]
+    ;;         [:i:!Si [:one-shot-shift-mode]]
+    ;;         [:o:!So [:one-shot-shift-mode]]
+    ;;         [:p:!Sp [:one-shot-shift-mode]]
+    ;;         [:semicolon:!Ssemicolon [:one-shot-shift-mode]]
+    ;;         [:a:!Sa [:one-shot-shift-mode]]
+    ;;         [:s:!Ss [:one-shot-shift-mode]]
+    ;;         [:d:!Sd [:one-shot-shift-mode]]
+    ;;         [:f:!Sf [:one-shot-shift-mode]]
+    ;;         [:g:!Sg [:one-shot-shift-mode]]
+    ;;         [:h:!Sh [:one-shot-shift-mode]]
+    ;;         [:h:!Sh [:one-shot-shift-mode]]
+            
+
+
+    ;;         ; Send right_shift unconditionally (so it still works as a modifier key)
+    ;;         [:left_shift :left_shift nil
+    ;;         ; and if pressed alone, trigger right-shift-mode
+    ;;         {:alone [:left_shift ["one-shot-shift-mode" 1]]
+    ;;         ; when another key is invoked, or after a timeout, set the mode back to zero
+    ;;         :delayed {:invoked ["one-shot-shift-mode" 0] :canceled ["one-shot-shift-mode" 0]}}]]}
+
+    {:des "symbols and numbers layer" 
+         :rules [[:condi :spacebar-mode :colemakdh] ; hold spacebar to use the numbers and symbols layer only on colemak-dh keyboard layout
+          [:non_us_backslash :grave_accent_and_tilde]
+          [:tab :b]
+          [:q :!S1]
+          [:w :!Scomma]
+          [:e :!Speriod]
+          [:r :open_bracket]
+          [:t :!S8]
+          [:y :!S6]
+          [:m :1]
+          [:comma :2]
+          [:period :3]
+          [:j :4]
+          [:k :5]
+          [:l :6]
+          [:u :7]
+          [:i :8]
+          [:o :9]
+          [:right_command :0]
+          [:p :!Sp]
+          [:open_bracket :delete_or_backspace]
+          [:close_bracket :delete_forward]
+          [:caps_lock :!Stab]
+          [:a :!S3]
+          [:s :!S4]
+          [:d :!S9]
+          [:f :!S0]
+          [:g :close_bracket]
+          [:h :equal_sign]
+          [:semicolon :hyphen]
+          [:quote :!Sequal_sign]
+          [:grave_accent_and_tilde :!Sb] 
+          [:z :!S5]
+          [:x :!Sopen_bracket]
+          [:c :!Sclose_bracket]
+          [:v :!S7]
+          [:b :!Sbackslash]
+          [:n :!S2] 
+          [:right_shift :!S8]
+          [:right_option :period]
+          ]}
+
+    {:des "leader key" 
+         :rules [[:condi :period-mode :colemakdh] ; hold caps-lock to use the predefned keysequences only on colemak-dh keyboard layout
+          [:a [:!S9 :!S0 :spacebar :equal_sign :!Speriod :spacebar :!Sopen_bracket :spacebar :!Sclose_bracket :left_arrow]]
+          [:b [:b :b :b :y :a :v :a :d :x :s :l :r :f :return_or_enter]]
+          ]} 
+         
+    {:des "navigation layer"
+        :rules [[:condi :a-mode :colemakdh] ;; only works on colemak-dh keyboard layout
+
+          [:##j :##left_arrow  ]
+          [:##k :##down_arrow  ]
+          [:##i :##up_arrow    ]
+          [:##l :##right_arrow ]
+          [:##period :##page_down]
+          [:##m :##page_up]
+          [:##comma :!COdown_arrow]
+          [:##u :##home]
+          [:##o :##end]
+          [:##s :left_option]
+          [:##d :left_shift]
+          [:##f :left_command]
+          [:##g :left_control]
+          [:##slash :!Sbackslash]
+
+          ;; switch tabs in most applications 
+          ;; Cmd Shift [
+          [:##v :!CSopen_bracket]
+          ;; Cmd Shift ]
+          [:##b :!CSclose_bracket]
+
+          ;; VSCode ctrl cmd →
+          ;; [:!Cleft_arrow :!CTleft_arrow]
+          ;; [:!Cright_arrow :!CTright_arrow]
+
+          ;; Quick Mouse handles
+          [:down_arrow {:mkey {:y 1536}}]
+          [:up_arrow {:mkey {:y -1536}}]
+          [:left_arrow {:mkey {:x -1536}}]
+          [:right_arrow {:mkey {:x 1536}}]
+
+    ;;   ]
+    ;; }
+   
+    ]}
+
+
+
+] ;; main list
+
+}
