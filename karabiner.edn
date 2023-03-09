@@ -289,6 +289,7 @@
           [:b [:b :b :b :y :a :v :a :d :x :s :l :r :f :return_or_enter]] ; obsidian javascript code block
           [:c [:!Scomma :c :l :v :!Speriod :!Scomma :slash :c :l :v :!Speriod :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow]] ; <div></div> 
           [:g [:!Scomma :f :a :g :!Speriod :!Scomma :slash :f :a :g :!Speriod :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow :left_arrow :!Cc :!Cc]] ;generic html tag, select both for editing <tag></tag>
+          [:comma [:x :semicolon :j :d :semicolon :u :k :period :u :semicolon :g :!S9 :!S0 :left_arrow]]
           ]} 
          
     {:des "navigation layer"
